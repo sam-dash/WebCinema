@@ -15,7 +15,6 @@ const getTopMovies = async () => {
         // Получаем api
         const response1 = await fetch(apiUrlTop, { headers: { 'accept': 'application/json','X-API-KEY': apiKey}})
         const topMovie = await response1.json();
-        console.log(topMovie)
         
         const mainContainer = document.querySelector('.main__container');
         const searchContainer = document.querySelector('.search__container')
@@ -50,40 +49,53 @@ const getTopMovies = async () => {
 
             // Функция с информационной карточкой о фильме
             const infoCardMovie = async (kinopoiskIdTop) => {
+                try {
+                    const response2 = await fetch(apiUrlFindById + kinopoiskIdTop, { headers: { 'accept': 'application/json','X-API-KEY': apiKey}})
+                    const findById = await response2.json()
 
-                const response2 = await fetch(apiUrlFindById + kinopoiskIdTop, { headers: { 'accept': 'application/json','X-API-KEY': apiKey}})
-                const findById = await response2.json()
 
-                const mainCardWindow = newElement('div', 'main__card-window')
-                mainCardWindow.innerHTML = `
-                <div class="main__window-wrapper">
-                    <img class="main__window-close" src="images/Close.svg" alt="Закрыть описание">
-                    <section class="main__window-poster">
-                        <img src="${findById.posterUrl}" alt="${findById.nameRu}">
-                    </section>
-                    <section class="main__window-parameters">
-                        <p class="main__card-name">${findById.nameRu}</p>
-                        <p class="main__year-of-production">Год выпуска: ${findById.year}</p>
-                        <p class="main__country">Страна:  ${findById.countries.map(countries => countries.country)}</p>
-                        <p class="main__genre">Жанр: ${findById.genres.map(countries => countries.genre)}</p>
-                        <p class="main__age">Возраст: ${findById.ratingAgeLimits}</p>
-                        <p class="main__description"> Описание: ${findById.description}</p>
-                    </section>
-                </div>`
+                    const genreWindow = findById.genres.map(genre => ' ' + genre.genre)
 
-                container.appendChild(mainCardWindow)
+                    let age 
+                    if (findById.ratingAgeLimits !== null) {
+                        age = findById.ratingAgeLimits.slice(3)
+                    }
 
-                if (findById.ratingAgeLimits === null){
-                    mainCardWindow.querySelector('.main__age').style.display = 'none'
-                }
+                    
 
-                const mainWindowCloseButtons = mainCardWindow.querySelectorAll('.main__window-close')
+                    const mainCardWindow = newElement('div', 'main__card-window')
+                    mainCardWindow.innerHTML = `
+                    <div class="main__window-wrapper">
+                        <img class="main__window-close" src="images/Close.svg" alt="Закрыть описание">
+                        <section class="main__window-poster">
+                            <img src="${findById.posterUrl}" alt="${findById.nameRu}">
+                        </section>
+                        <section class="main__window-parameters">
+                            <p class="main__card-name">${findById.nameRu}</p>
+                            <p class="main__year-of-production">Год выпуска: ${findById.year}</p>
+                            <p class="main__country">Страна:  ${findById.countries.map(countries => countries.country)}</p>
+                            <p class="main__genre">Жанр: ${genreWindow}</p>
+                            <p class="main__age">Возраст: ${age}</p>
+                            <p class="main__description"> Описание: ${findById.description}</p>
+                        </section>
+                    </div>`
+                    
+                    container.appendChild(mainCardWindow)
 
-                mainWindowCloseButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        mainCardWindow.style.display = 'none';
+                    if (findById.ratingAgeLimits === null){
+                        mainCardWindow.querySelector('.main__age').style.display = 'none'
+                    }
+
+                    const mainWindowCloseButtons = mainCardWindow.querySelectorAll('.main__window-close')
+
+                    mainWindowCloseButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            mainCardWindow.style.display = 'none';
+                        })
                     })
-                })
+                } catch (error) {
+                    console.log('Произошла ошибка:' + error.message)
+                }
             }
             mainMovieCard.addEventListener('click', () => infoCardMovie(kinopoiskIdTop))
         }
@@ -97,29 +109,39 @@ const getTopMovies = async () => {
 
         // Поиск фильма по названию
         const checkMovie = async (currentFilm) => {
-            const response3 = await fetch(apiUrlKeyword + currentFilm + `&page=1`, { headers: { 'accept': 'application/json','X-API-KEY': apiKey}})
-            const searchMovie = await response3.json();
-            console.log(searchMovie)
+            try {
+                const response3 = await fetch(apiUrlKeyword + currentFilm + `&page=1`, { headers: { 'accept': 'application/json','X-API-KEY': apiKey}})
+                const searchMovie = await response3.json();
+                console.log(searchMovie)
+
+                const H1Top = document.querySelector('.main__return');
+                H1Top.textContent = 'Главная';
+
+                // mainMovieCard(checkMovieData)
+                searchMovie.films.forEach((filmName) => mainMovieCard (filmName, searchContainer))
 
 
-            // mainMovieCard(checkMovieData)
-            searchMovie.films.forEach((filmName) => {
-                mainMovieCard (filmName, searchContainer)
-            })
+                if (searchMovie.searchFilmsCountResult === 0) {                   
+                    const notFound = document.querySelector('.header__not_found_film')
+                    notFound.style.display = "block"
+                    setTimeout(() => notFound.style.display = "none", 5000);
+                } else {
+                    mainContainer.style.display = 'none'
+                }
+
+            } catch (error) {
+                console.log('Произошла ошибка:' + error.message)
+            }
         }
 
         btn.addEventListener('click', () => {
-            mainContainer.style.display = 'none'
-            searchContainer.style.display = 'flex'
             currentFilm = search.value
             checkMovie(currentFilm)
             search.value = ''
-        })
+            })
 
         search.addEventListener('keydown', event => {
             if (event.keyCode === 13) {
-                mainContainer.style.display = 'none'
-                searchContainer.style.display = 'flex'
                 currentFilm = search.value
                 checkMovie(currentFilm)
                 search.value = ''

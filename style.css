@@ -19,16 +19,25 @@ body {
     gap: 40px;
 }
 
+.header__not_found_film {
+    font-weight: 700;
+    display: none;
+}
+
 .header__nav {
     width: 350px;
     height: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #e1d3ef;
+    background: #4a256c;
     border-radius: 20px;
     padding: 0 10px;
     transition: transform 0.3s ease;
+}
+
+::-webkit-input-placeholder {
+    color: rgb(189, 183, 189);
 }
 
 .header__nav:hover {
@@ -39,6 +48,8 @@ body {
     all: initial;
     cursor: text;
     width: 300px;
+    caret-color: #fff;
+    color: #fff;
 }
 
 .header__button {
@@ -74,7 +85,7 @@ body {
     padding: 70px 0;
     max-width: 1200px;
     margin: 0 auto;
-    display: none;
+    display: flex;
     gap: 70px;
     justify-content: center;
     flex-wrap: wrap;
@@ -83,7 +94,7 @@ body {
 
 .main__return {
     position: absolute;
-    top: 20px;
+    top: -130px;
     left: 75px;
     background-color: #222220;
     border-radius: 20px;
@@ -107,7 +118,7 @@ body {
 }
 
 .main__movie-card-img {
-    width: 210px;
+    width: 205px;
     height: 300px;
     border-radius: 20px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
@@ -153,28 +164,30 @@ body {
 .main__window-wrapper {
     margin: 50px auto;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 50px;
     color: #fff;
     max-width: 800px;
     position: relative;
-    padding: 0 20px;
+    /* padding: 0 20px; */
 }
 
 .main__window-poster img {
-    width: 300px;
-    height: 410px;
+    width: 360px;
+    height: 540px;
     border-radius: 20px;
 }
 
 .main__window-parameters {
     line-height: 1.7;
+    width: 330px;
 }
 
 .main__window-close {
     position: absolute;
     width: 20px;
     height: 20px;
-    right: 20px;
+    right: 0px;
     cursor: pointer;
 }
